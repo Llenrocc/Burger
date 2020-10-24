@@ -1,10 +1,9 @@
-// Requirements
-var connection = require('./connection.js');
+const connection = require('./connection.js');
 
 //Connect to DB
 var orm = {
     selectAll: function (callback) {
-        //mySQL Query
+        
         connection.query('SELECT * FROM burgers', function (err, result) {
             if (err) throw err;
             callback(result);

@@ -1,10 +1,4 @@
-body {
-    background-image: url(
-    "../img/bkgrnd.jpg");
-    background-size: 100%;  
-}
-  
-  .jumbotron h1{
+.jumbotron h1{
       color: black;
   
   }
