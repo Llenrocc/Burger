@@ -1,32 +1,47 @@
-const express = require("express");
+const routes = require("express").Router();
+const Burger = require('../models/burger'); // Import the model burger.js
+
 const router = express.Router();
-const burger = require('../models/burger'); // Import the model burger.js
-
-router.get('/', function (req, res) {
-    res.redirect('/index');
-});
-
-// Index page
-router.get('/index', function (req, res) {
-    burger.selectAll(function (data) {
-        const hbsObject = { burgers: data };
-        res.render('index', hbsObject);
+routes.get("/", function (req, res) {
+    Burger.selectBurgers().then(result => {
+        // Populate results based on devoured status
+        let devoured = result.filter(b => b.devoured === 1);
+        let undevoured = result.filter(b => b.devoured === 0);
+        res.render("index", {
+            undevouredList: undevoured,
+            devouredList: devoured
+        });
+    }).catch((err) => {
+        res.status(500).send({error: err});
     });
 });
 
-// create a burger
-router.post('/burger/create', function (req, res) {
-    burger.insertOne(req.body.burger_name, function () {
-        res.redirect('/index');
+routes.get("/api/burger", (req, res) => {
+    Burger.selectBurgers().then((err, result) => {
+        res.send(result);
+    }).catch((err) => {
+        res.status(500).send({error: err});
     });
 });
 
-//devour the burger
-router.post('/burger/eat:id', function (req, res) {
-    burger.updateOne(req.params.id, function () {
-        res.redirect('/index');
+routes.post("/api/burger", (req, res) => {
+    if (!req.body.name) {
+        res.status(500).send({error: "Burger name is required"});
+    }
+    let newBurger = new Burger(req.body.name);
+    Burger.create(newBurger).then(id => {
+        res.json(id);
+    }).catch((err) => {
+        res.status(500).send({error: err});
     });
 });
 
-// Export routes for server.js
+routes.put("/api/burger/:id", (req, res) => {
+    Burger.updateDevoured(req.params.id).then(result => {
+        res.json(result);
+    }).catch((err) => {
+        res.status(500).send({error: err});
+    });
+});
+
 module.exports = router;

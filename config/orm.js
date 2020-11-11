@@ -1,32 +1,41 @@
-const connection = require('./connection.js');
+const connection = require('./connection');
 
-//Connect to DB
-var orm = {
-    selectAll: function (callback) {
-        
-        connection.query('SELECT * FROM burgers', function (err, result) {
-            if (err) throw err;
-            callback(result);
+const orm = {
+    selectAll: function (tableName) {
+        const query = "SELECT * FROM ??";
+        return new Promise((resolve, reject) => {
+            connection.query(query, [tableName], (err, results) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(results);
+                }
+            });
         });
     },
-    //add a burger
-    insertOne: function (burger_name, callback) {
-        connection.query('INSERT INTO burgers SET ?',
-            {
-                burger_name: burger_name,
-                devoured: false,
-            }, function (err, result) {
-                if (err) throw err;
-                callback(result);
+    insertOne: function (tableName, obj) {
+        const query = `INSERT INTO BURGERS SET ?`;
+        return new Promise((resolve, reject) => {
+            connection.query(query, obj, (err, results) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(results);
+                }
             });
+        });
     },
-    //move a burger
-    updateOne: function (burgerID, callback) {
-        connection.query('UPDATE burgers SET ? WHERE ?', [{ devoured: true }, { id: burgerID }],
-            function (err, result) {
-                if (err) throw err;
-                callback(result);
+    updateOne: function (tableName, updCol, updVal, idCol, objId) {
+        const query = "UPDATE ?? SET ?? = ? WHERE ?? = ?";
+        return new Promise((resolve, reject) => {
+            connection.query(query, [tableName, updCol, updVal, idCol, objId], (err, results) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(results);
+                }
             });
+        });
     }
 };
 
